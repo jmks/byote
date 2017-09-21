@@ -1,11 +1,23 @@
+#include <stdlib.h>
 #include <termios.h>
 #include <unistd.h>
 
-void enableRawMode() {
-  struct termios raw;
+struct termios original_termios;
 
-  // read terminal attributes
-  tcgetattr(STDIN_FILENO, &raw);
+// restore original terminal attributes
+void disableRawMode() {
+  tcsetattr(STDIN_FILENO, TCSAFLUSH, &original_termios);
+}
+
+void enableRawMode() {
+  // store original terminal attributes, to restore later
+  tcgetattr(STDIN_FILENO, &original_termios);
+
+  // register a function to be executed when program exist
+  atexit(disableRawMode);
+
+  // copy attributes from original
+  struct termios raw = original_termios;
 
   // lflags is local flags
   // other flags include input flags (c_iflag), output flags (c_oflag) and
