@@ -24,6 +24,9 @@ void enableRawMode() {
   // disable ctrl-s, ctrl-q
   raw.c_iflag &= ~(ICRNL | IXON);
 
+  // disable the output translation of "\n" into "\r\n"
+  raw.c_oflag &= ~(OPOST);
+
   // lflags is local flags
   // other flags include input flags (c_iflag), output flags (c_oflag) and
   // control flags (c_cflag)
@@ -44,7 +47,7 @@ int main() {
     if (iscntrl(c)) {
       printf("%d\n", c);
     } else {
-      printf("%d ('%c')\n", c, c);
+      printf("%d ('%c')\r\n", c, c);
     }
   }
 
