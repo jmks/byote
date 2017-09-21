@@ -1,4 +1,5 @@
 #include <ctype.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <termios.h>
@@ -6,14 +7,23 @@
 
 struct termios original_termios;
 
+void die(const char *s) {
+  // print description of error in global errno variable
+  perror(s);
+
+  // signal failure
+  exit(1);
+}
+
 // restore original terminal attributes
 void disableRawMode() {
-  tcsetattr(STDIN_FILENO, TCSAFLUSH, &original_termios);
+  if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &original_termios) == -1)
+    die("tcgetattr");
 }
 
 void enableRawMode() {
   // store original terminal attributes, to restore later
-  tcgetattr(STDIN_FILENO, &original_termios);
+  if (tcgetattr(STDIN_FILENO, &original_termios) == -1) die("tcgetattr");
 
   // register a function to be executed when program exist
   atexit(disableRawMode);
@@ -46,7 +56,7 @@ void enableRawMode() {
   // write terminal attributes
   // TCSAFLUSH waits for all output to be written to terminal before applying change
   // also discards anything not yet read
-  tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
+  if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1) die("tcsetattr");
 }
 
 int main() {
@@ -55,7 +65,7 @@ int main() {
   while (1) {
     char c = '\0';
 
-    read(STDIN_FILENO, &c, 1);
+    if (read(STDIN_FILENO, &c, 1) == -1 && errno != EAGAIN) die("read");
 
     // is control character
     if (iscntrl(c)) {
