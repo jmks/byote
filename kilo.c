@@ -1,3 +1,5 @@
+/*** includes ***/
+
 #include <ctype.h>
 #include <errno.h>
 #include <stdio.h>
@@ -5,7 +7,11 @@
 #include <termios.h>
 #include <unistd.h>
 
+/*** data ***/
+
 struct termios original_termios;
+
+/*** terminal ***/
 
 void die(const char *s) {
   // print description of error in global errno variable
@@ -58,6 +64,8 @@ void enableRawMode() {
   // also discards anything not yet read
   if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1) die("tcsetattr");
 }
+
+/*** init ***/
 
 int main() {
   enableRawMode();
