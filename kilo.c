@@ -24,6 +24,12 @@ void enableRawMode() {
   // disable ctrl-s, ctrl-q
   raw.c_iflag &= ~(ICRNL | IXON);
 
+  // disable more flags part of "raw mode"
+  raw.c_iflag &= ~(BRKINT | INPCK | ISTRIP);
+
+  // character size to 8 bits per byte (probably already set)
+  raw.c_cflag |= ~(CS8);
+
   // disable the output translation of "\n" into "\r\n"
   raw.c_oflag &= ~(OPOST);
 
