@@ -38,6 +38,11 @@ void enableRawMode() {
   // control flags (c_cflag)
   raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
 
+  // minimum bytes of input to read
+  raw.c_cc[VMIN] = 0;
+  // timeout read after 1 * 100ms
+  raw.c_cc[VTIME] = 1;
+
   // write terminal attributes
   // TCSAFLUSH waits for all output to be written to terminal before applying change
   // also discards anything not yet read
@@ -47,14 +52,19 @@ void enableRawMode() {
 int main() {
   enableRawMode();
 
-  char c;
-  while (read(STDIN_FILENO, &c, 1) == 1 && c != 'q') {
+  while (1) {
+    char c = '\0';
+
+    read(STDIN_FILENO, &c, 1);
+
     // is control character
     if (iscntrl(c)) {
       printf("%d\n", c);
     } else {
       printf("%d ('%c')\r\n", c, c);
     }
+
+    if (c == 'q') break;
   }
 
   return 0;
