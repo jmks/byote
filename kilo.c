@@ -92,12 +92,28 @@ void editorProcessKeypress() {
   }
 }
 
+/*** output ***/
+
+void editorRefreshScreen() {
+  // write escape sequence to terminal
+  // \x1b is the escape character, followed by [
+  // J command erases the screen
+  // 2 is argument to erase whole screen
+  // 1 would clear screen up to cursor
+  // 0 would clear screen from cursor to the end of the screen
+  write(STDOUT_FILENO, "\x1b[2J", 4);
+
+  // position cursor to top-left
+  write(STDOUT_FILENO, "\x1b[H", 3);
+}
+
 /*** init ***/
 
 int main() {
   enableRawMode();
 
   while (1) {
+    editorRefreshScreen();
     editorProcessKeypress();
   }
 
