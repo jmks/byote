@@ -13,7 +13,11 @@
 
 /*** data ***/
 
-struct termios original_termios;
+struct editorConfig {
+  struct termios original_termios;
+};
+
+struct editorConfig E;
 
 /*** terminal ***/
 
@@ -31,19 +35,19 @@ void die(const char *s) {
 
 // restore original terminal attributes
 void disableRawMode() {
-  if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &original_termios) == -1)
+  if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &E.original_termios) == -1)
     die("tcgetattr");
 }
 
 void enableRawMode() {
   // store original terminal attributes, to restore later
-  if (tcgetattr(STDIN_FILENO, &original_termios) == -1) die("tcgetattr");
+  if (tcgetattr(STDIN_FILENO, &E.original_termios) == -1) die("tcgetattr");
 
   // register a function to be executed when program exist
   atexit(disableRawMode);
 
   // copy attributes from original
-  struct termios raw = original_termios;
+  struct termios raw = E.original_termios;
 
   // disable ctrl-s, ctrl-q
   raw.c_iflag &= ~(ICRNL | IXON);
