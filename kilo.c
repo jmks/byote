@@ -162,33 +162,39 @@ void abFree(struct abuf *ab) {
 
 /*** output ***/
 
-void editorDrawRows() {
+void editorDrawRows(struct abuf *ab) {
   int y;
 
   for (y = 0; y < E.screenrows; y++) {
-    write(STDOUT_FILENO, "~", 1);
+    abAppend(ab, "~", 1);
 
     if (y < E.screenrows - 1) {
-      write(STDOUT_FILENO, "\r\n", 2);
+      abAppend(ab, "\r\n", 2);
     }
   }
 }
 
 void editorRefreshScreen() {
-  // write escape sequence to terminal
+  struct abuf ab = ABUF_INIT;
+
+  // write escape sequence to append buffer
   // \x1b is the escape character, followed by [
   // J command erases the screen
   // 2 is argument to erase whole screen
   // 1 would clear screen up to cursor
   // 0 would clear screen from cursor to the end of the screen
-  write(STDOUT_FILENO, "\x1b[2J", 4);
+  abAppend(&ab, "\x1b[2J", 4);
 
   // position cursor to top-left
-  write(STDOUT_FILENO, "\x1b[H", 3);
+  abAppend(&ab, "\x1b[H", 3);
 
-  editorDrawRows();
+  editorDrawRows(&ab);
 
-  write(STDOUT_FILENO, "\x1b[H", 3);
+  abAppend(&ab, "\x1b[H", 3);
+
+  // write out buffer's contents to screen
+  write(STDOUT_FILENO, ab.b, ab.len);
+  abFree(&ab);
 }
 
 /*** init ***/
