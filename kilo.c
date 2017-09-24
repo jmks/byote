@@ -2,6 +2,7 @@
 
 #include <ctype.h>
 #include <errno.h>
+#include <sys/ioctl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <termios.h>
@@ -43,7 +44,7 @@ void enableRawMode() {
   // store original terminal attributes, to restore later
   if (tcgetattr(STDIN_FILENO, &E.original_termios) == -1) die("tcgetattr");
 
-  // register a function to be executed when program exist
+  // register a function to be executed when program exits
   atexit(disableRawMode);
 
   // copy attributes from original
@@ -99,6 +100,20 @@ void editorProcessKeypress() {
     write(STDOUT_FILENO, "\x1b[H", 3);
     exit(0);
     break;
+  }
+}
+
+// common way to return multiple values: use multiple pointers
+int getWindowSize(int *rows, int *cols) {
+  struct winsize ws;
+
+  // ask IO Control for Terminal WINdow SiZe
+  if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == -1 || ws.ws_col == 0) {
+    return -1;
+  } else {
+    *cols = ws.ws_col;
+    *rows = ws.ws_row;
+    return 0;
   }
 }
 
