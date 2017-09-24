@@ -177,6 +177,9 @@ void editorDrawRows(struct abuf *ab) {
 void editorRefreshScreen() {
   struct abuf ab = ABUF_INIT;
 
+  // hide the cursor while the redraw happens
+  abAppend(&ab, "\x1b[?25l", 6);
+
   // write escape sequence to append buffer
   // \x1b is the escape character, followed by [
   // J command erases the screen
@@ -191,6 +194,9 @@ void editorRefreshScreen() {
   editorDrawRows(&ab);
 
   abAppend(&ab, "\x1b[H", 3);
+
+  // show the cursor again
+  abAppend(&ab, "\x1b[?25h", 6);
 
   // write out buffer's contents to screen
   write(STDOUT_FILENO, ab.b, ab.len);
