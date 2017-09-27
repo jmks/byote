@@ -168,6 +168,10 @@ void editorDrawRows(struct abuf *ab) {
   for (y = 0; y < E.screenrows; y++) {
     abAppend(ab, "~", 1);
 
+    // clear line with K command
+    // 0 (default) whole line, 1 left of cursor, 2 right of cursor
+    abAppend(ab, "\x1b[K", 3);
+
     if (y < E.screenrows - 1) {
       abAppend(ab, "\r\n", 2);
     }
@@ -179,14 +183,6 @@ void editorRefreshScreen() {
 
   // hide the cursor while the redraw happens
   abAppend(&ab, "\x1b[?25l", 6);
-
-  // write escape sequence to append buffer
-  // \x1b is the escape character, followed by [
-  // J command erases the screen
-  // 2 is argument to erase whole screen
-  // 1 would clear screen up to cursor
-  // 0 would clear screen from cursor to the end of the screen
-  abAppend(&ab, "\x1b[2J", 4);
 
   // position cursor to top-left
   abAppend(&ab, "\x1b[H", 3);
