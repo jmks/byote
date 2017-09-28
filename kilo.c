@@ -106,7 +106,7 @@ int editorReadKey() {
     if (read(STDIN_FILENO, &seq[0], 1) != 1) return '\x1b';
     if (read(STDIN_FILENO, &seq[1], 1) != 1) return '\x1b';
 
-    // return the WASD key for the correct escape sequence
+    // return the multi-byte keys for the given escape sequences
     if (seq[0] == '[') {
       switch (seq[1]) {
         case 'A': return ARROW_UP;
