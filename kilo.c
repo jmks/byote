@@ -2,10 +2,11 @@
 
 #include <ctype.h>
 #include <errno.h>
-#include <sys/ioctl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/ioctl.h>
+#include <sys/types.h>
 #include <termios.h>
 #include <unistd.h>
 
@@ -28,10 +29,18 @@ enum editorKey {
 
 /*** data ***/
 
+// "editor row" representing a line of text
+typedef struct erow {
+  int size;
+  char *chars;
+} erow;
+
 struct editorConfig {
   int cx, cy;
   int screenrows;
   int screencols;
+  int numrows;
+  erow row;
   struct termios original_termios;
 };
 
@@ -235,6 +244,19 @@ int getWindowSize(int *rows, int *cols) {
   }
 }
 
+/*** file i/o ***/
+
+void editorOpen() {
+  char *line = "Hello, World!";
+  ssize_t linelen = 13;
+
+  E.row.size = linelen;
+  E.row.chars = malloc(linelen + 1);
+  memcpy(E.row.chars, line, linelen);
+  E.row.chars[linelen] = '\0';
+  E.numrows = 1;
+}
+
 /*** append buffer ***/
 
 struct abuf {
@@ -323,6 +345,7 @@ void editorRefreshScreen() {
 void initEditor() {
   E.cx = 0;
   E.cy = 0;
+  E.numrows = 0;
 
   if (getWindowSize(&E.screenrows, &E.screencols) == -1) die("getWindowSize");
 }
@@ -330,6 +353,7 @@ void initEditor() {
 int main() {
   enableRawMode();
   initEditor();
+  editorOpen();
 
   while (1) {
     editorRefreshScreen();
