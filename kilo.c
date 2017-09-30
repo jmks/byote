@@ -285,25 +285,34 @@ void editorDrawRows(struct abuf *ab) {
   int y;
 
   for (y = 0; y < E.screenrows; y++) {
-    if (y == E.screenrows / 3) {
-      char welcome[80];
-      int welcomelen = snprintf(welcome, sizeof(welcome),
-        "Kilo editor -- version %s", KILO_VERSION);
+    if (y >= E.numrows) {
+      if (y == E.screenrows / 3) {
+        char welcome[80];
+        int welcomelen = snprintf(welcome, sizeof(welcome),
+                                  "Kilo editor -- version %s", KILO_VERSION);
 
-      if (welcomelen > E.screencols) welcomelen = E.screencols;
+        if (welcomelen > E.screencols) welcomelen = E.screencols;
 
-      // pad welcome line with tilda + spaces
-      // to center welcome message
-      int padding = (E.screencols - welcomelen) / 2;
-      if (padding) {
+        // pad welcome line with tilda + spaces
+        // to center welcome message
+        int padding = (E.screencols - welcomelen) / 2;
+        if (padding) {
+          abAppend(ab, "~", 1);
+          padding--;
+        }
+        while (padding--) abAppend(ab, " ", 1);
+
+        abAppend(ab, welcome, welcomelen);
+      } else {
         abAppend(ab, "~", 1);
-        padding--;
       }
-      while (padding--) abAppend(ab, " ", 1);
-
-      abAppend(ab, welcome, welcomelen);
     } else {
-      abAppend(ab, "~", 1);
+      int len = E.row.size;
+
+      // truncate any line wider than the screen
+      if (len > E.screencols) len = E.screencols;
+
+      abAppend(ab, E.row.chars, len);
     }
 
     // clear line with K command
