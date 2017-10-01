@@ -172,7 +172,7 @@ void editorMoveCursor(int key) {
     if (E.cx != 0) E.cx--;
     break;
   case ARROW_RIGHT:
-    if (E.cx != E.screencols - 1) E.cx++;
+    E.cx++;
     break;
   case ARROW_UP:
     if (E.cy != 0) E.cy--;
@@ -317,6 +317,14 @@ void editorScroll() {
   if (E.cy >= E.rowoff + E.screenrows) {
     E.rowoff = E.cy + E.screenrows + 1;
   }
+
+  if (E.cx < E.coloff) {
+    E.coloff = E.cx;
+  }
+
+  if (E.cx >= E.coloff + E.screencols) {
+    E.coloff = E.cx - E.screencols + 1;
+  }
 }
 
 void editorDrawRows(struct abuf *ab) {
@@ -347,12 +355,15 @@ void editorDrawRows(struct abuf *ab) {
         abAppend(ab, "~", 1);
       }
     } else {
-      int len = E.row[filerow].size;
+      int len = E.row[filerow].size - E.coloff;
+
+      // if length is now negative, display nothing
+      if (len < 0) len = 0;
 
       // truncate any line wider than the screen
       if (len > E.screencols) len = E.screencols;
 
-      abAppend(ab, E.row[filerow].chars, len);
+      abAppend(ab, &E.row[filerow].chars[E.coloff], len);
     }
 
     // clear line with K command
