@@ -187,6 +187,14 @@ void editorMoveCursor(int key) {
     }
     break;
   }
+
+  row = (E.cy >= E.numrows) ? NULL : &E.row[E.cy];
+  int rowlen = row ? row->size : 0;
+
+  // snap column position back to row length
+  if (E.cx > rowlen) {
+    E.cx = rowlen;
+  }
 }
 
 void editorProcessKeypress() {
