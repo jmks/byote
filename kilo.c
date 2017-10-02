@@ -275,6 +275,20 @@ int getWindowSize(int *rows, int *cols) {
 
 /*** row operations ***/
 
+void editorUpdateRow(erow *row) {
+  free(row->render);
+  row->render = malloc(row->size + 1);
+
+  int j;
+  int idx = 0;
+  for (j = 0; j < row->size; j++) {
+    row->render[idx++] = row->chars[j];
+  }
+
+  row->render[idx] = '\0';
+  row->rsize = idx;
+}
+
 void editorAppendRow(char *s, size_t len) {
   E.row = realloc(E.row, sizeof(erow) * (E.numrows + 1));
 
@@ -286,6 +300,8 @@ void editorAppendRow(char *s, size_t len) {
 
   E.row[at].rsize = 0;
   E.row[at].render = NULL;
+
+  editorUpdateRow(&E.row[at]);
 
   E.numrows++;
 }
@@ -381,7 +397,7 @@ void editorDrawRows(struct abuf *ab) {
         abAppend(ab, "~", 1);
       }
     } else {
-      int len = E.row[filerow].size - E.coloff;
+      int len = E.row[filerow].rsize - E.coloff;
 
       // if length is now negative, display nothing
       if (len < 0) len = 0;
@@ -389,7 +405,7 @@ void editorDrawRows(struct abuf *ab) {
       // truncate any line wider than the screen
       if (len > E.screencols) len = E.screencols;
 
-      abAppend(ab, &E.row[filerow].chars[E.coloff], len);
+      abAppend(ab, &E.row[filerow].render[E.coloff], len);
     }
 
     // clear line with K command
