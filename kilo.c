@@ -450,9 +450,7 @@ void editorDrawRows(struct abuf *ab) {
     // 0 (default) whole line, 1 left of cursor, 2 right of cursor
     abAppend(ab, "\x1b[K", 3);
 
-    if (y < E.screenrows - 1) {
-      abAppend(ab, "\r\n", 2);
-    }
+    abAppend(ab, "\r\n", 2);
   }
 }
 
@@ -495,6 +493,9 @@ void initEditor() {
   E.row = NULL;
 
   if (getWindowSize(&E.screenrows, &E.screencols) == -1) die("getWindowSize");
+
+  // save row for status bar
+  E.screenrows -= 1;
 }
 
 int main(int argc, char *argv[]) {
