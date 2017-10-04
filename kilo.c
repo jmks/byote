@@ -254,6 +254,10 @@ void editorProcessKeypress() {
     case ARROW_RIGHT:
       editorMoveCursor(c);
       break;
+
+    default:
+      editorInsertChar(c);
+      break;
   }
 }
 
@@ -359,6 +363,18 @@ void editorAppendRow(char *s, size_t len) {
   editorUpdateRow(&E.row[at]);
 
   E.numrows++;
+}
+
+/*** editor operations ***/
+
+void editorInsertChar(int c) {
+  // cursor is on a new row at the end of the file
+  if (E.cy == E.numrows) {
+    editorAppendRow("", 0);
+  }
+
+  editorRowInsertChar(&E.row[E.cy], E.cx, c);
+  E.cx++;
 }
 
 /*** file i/o ***/
