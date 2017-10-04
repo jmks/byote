@@ -327,6 +327,23 @@ void editorUpdateRow(erow *row) {
   row->rsize = idx;
 }
 
+void editorRowInsertChar(erow *row, int at, int c) {
+  // if at is out of range, append to the end
+  if (at < 0 || at > row->size) at = row->size;
+
+  // allocate more space for new char
+  row->chars = realloc(row->chars, row->size + 2);
+
+  // copy at..-1 from old offsets to new offsets
+  memmove(&row->chars[at + 1], &row->chars[at], row->size - at + 1);
+
+  // insert new character
+  row->size++;
+  row->chars[at] = c;
+
+  editorUpdateRow(row);
+}
+
 void editorAppendRow(char *s, size_t len) {
   E.row = realloc(E.row, sizeof(erow) * (E.numrows + 1));
 
