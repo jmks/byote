@@ -62,6 +62,10 @@ struct editorConfig {
 
 struct editorConfig E;
 
+/*** function prototypes ***/
+
+void editorInsertChar();
+
 /*** terminal ***/
 
 void die(const char *s) {
