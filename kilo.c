@@ -66,6 +66,7 @@ struct editorConfig E;
 /*** function prototypes ***/
 
 void editorInsertChar();
+void editorSave();
 
 /*** terminal ***/
 
