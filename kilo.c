@@ -67,6 +67,7 @@ struct editorConfig E;
 
 void editorInsertChar();
 void editorSave();
+void editorSetStatusMessage(const char *fmt, ...);
 
 /*** terminal ***/
 
@@ -463,6 +464,7 @@ void editorSave() {
       if (write(fd, buf, len) != -1) {
         close(fd);
         free(buf);
+        editorSetStatusMessage("%d bytes written to disk", len);
         return;
       }
     }
@@ -470,6 +472,7 @@ void editorSave() {
   }
 
   free(buf);
+  editorSetStatusMessage("Cant save! I/O erorr: %s", strerror(errno));
 }
 
 /*** append buffer ***/
