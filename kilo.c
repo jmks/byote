@@ -69,6 +69,7 @@ struct editorConfig E;
 
 void editorDelChar();
 void editorInsertChar();
+void editorInsertNewline();
 void editorSave();
 void editorSetStatusMessage(const char *fmt, ...);
 void editorRefreshScreen();
