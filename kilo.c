@@ -233,7 +233,7 @@ void editorProcessKeypress() {
 
   switch (c) {
     case '\r':
-      /* TODO */
+      editorInsertNewline();
       break;
 
     case CTRL_KEY('q'):
@@ -458,6 +458,26 @@ void editorInsertChar(int c) {
 
   editorRowInsertChar(&E.row[E.cy], E.cx, c);
   E.cx++;
+}
+
+void editorInsertNewline() {
+  if (E.cx == 0) {
+    editorInsertRow(E.cy, "", 0);
+  } else {
+    erow *row = &E.row[E.cy];
+    editorInsertRow(E.cy + 1, &row->chars[E.cx], row->size - E.cx);
+
+    // update row size and text
+    row = &E.row[E.cy];
+    row->size = E.cx;
+    row->chars[row->size] = '\0';
+
+    editorUpdateRow(row);
+  }
+
+  E.cy++;
+  // move cursor to beginning of the new line
+  E.cx = 0;
 }
 
 void editorDelChar() {
