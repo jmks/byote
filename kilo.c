@@ -71,9 +71,9 @@ void editorDelChar();
 void editorFind();
 void editorInsertChar();
 void editorInsertNewline();
+void editorRefreshScreen();
 void editorSave();
 void editorSetStatusMessage(const char *fmt, ...);
-void editorRefreshScreen();
 
 /*** terminal ***/
 
